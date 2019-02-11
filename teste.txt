@@ -1,0 +1,61 @@
+using Microsoft.Office.Interop.Outlook;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //Criando uma instancia do outlook
+            Application outlook = new Application();
+
+            //Agora vamos nos autenticar
+            NameSpace ns = outlook.GetNamespace("Mapi");
+            object _missing = Type.Missing;
+            ns.Logon(_missing, _missing, false, true);
+
+
+            //Apenas como exemplo vamos selecionar a Inbox para ler seus e-mails
+            MAPIFolder inbox = ns.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+            //Exemplo de recurso da DLL, abaixo vemos com identificar quantos emails não lidos ainda
+            int unread = inbox.UnReadItemCount;
+
+            var buffer = new List<string>();
+
+            foreach (MAPIFolder folder in ns.Folders)
+            {
+                var ret = GetFolders(folder);
+            }
+
+            //Agora podemos fazer um loop e ler todos os emails da pasta selecionada
+            foreach (MailItem mail in inbox.Items)
+            {
+                string body = mail.Body;
+                string subject = mail.Subject;
+            }
+        }
+
+        public static string GetFolders(MAPIFolder folder)
+        {
+            if (folder.Folders.Count == 0)
+            {
+                Console.WriteLine(folder.FullFolderPath);
+                return folder.FullFolderPath;
+            }
+            else
+            {
+                foreach (MAPIFolder subFolder in folder.Folders)
+                {
+                    GetFolders(subFolder);
+                }
+            }
+
+            return string.Empty;
+        }
+    }
+}
